@@ -2,15 +2,15 @@ import React from "react";
 import { Route } from "react-router-dom";
 
 // Import Pages
-import Survey from "./Pages/Survey";
-import Results from "./Pages/Results";
+import Survey from "./Pages/Survey/Survey";
+import Results from "./Pages/Results/Results";
 
 function App() {
   return (
     <div>
       <Route exact path="/" component={Survey} />
-      <Route exact path="/survey" component={Survey} />
-      <Route exact path="/results" component={Results} />
+      <Route path="/survey" component={Survey} />
+      <Route path="/results" component={Results} />
     </div>
   );
 }
