@@ -4,6 +4,8 @@ import ReCAPTCHA from "react-google-recaptcha";
 import Header from "../../components/Header";
 import MuiPhoneNumber from "material-ui-phone-number";
 
+const listOfStates = require("./listOfStates"); // Grab the list of all 50 states from listOfStates.js
+
 const useStyles = makeStyles((theme) => ({
 	root: {
 		margin: "40px auto",
@@ -51,14 +53,21 @@ function Survey(props) {
 	const [state, setState] = useState("");
 
 	const [email, setEmail] = useState("");
+	const [confirmEmail, setConfirmEmail] = useState("");
 
 	const [checkedTermsAndConditions, setCheckedTermsAndConditions] = useState(false);
 	const [checkedCaptcha, setCheckedCaptcha] = useState(false);
 	const [checkedValidationNameError, setCheckedValidationNameError] = useState(false);
 	const [checkedAddressError, setCheckedAddressError] = useState(false);
+	const [checkedZipCodeError, setCheckedZipCodeError] = useState(false);
+	const [checkedEmailError, setCheckedEmailError] = useState(false);
+	const [checkedConfirmEmailError, setCheckedConfirmEmailError] = useState(false);
 
 	const [containsError, setContainsError] = useState(false);
-	const [errorText, setErrorText] = useState("");
+	const [addressErrorText, setAddressErrorText] = useState("");
+	const [zipCodeErrorText, setZipCodeErrorText] = useState("");
+	const [emailErrorText, setEmailErrorText] = useState("");
+	const [confirmEmailErrorText, setConfirmEmailErrorText] = useState("");
 
 	// This gets called only once after refreshing or pressing the back button to repopulate the fields with your old information.
 	useEffect(() => {
@@ -98,60 +107,12 @@ function Survey(props) {
 		zipCode: zipCode,
 		city: city,
 		state: state,
-		email: email
+		email: email,
+		confirmEmail: confirmEmail,
+		checkedTermsAndConditions: checkedTermsAndConditions,
+		checkedCaptcha: checkedCaptcha,
+		checkedValidationNameError: checkedValidationNameError
 	};
-
-	const listOfStates = [
-		"AL",
-		"AK",
-		"AZ",
-		"AR",
-		"CA",
-		"CO",
-		"CT",
-		"DE",
-		"FL",
-		"GA",
-		"HI",
-		"ID",
-		"IL",
-		"IN",
-		"IA",
-		"KS",
-		"KY",
-		"LA",
-		"ME",
-		"MD",
-		"MA",
-		"MI",
-		"MN",
-		"MS",
-		"MO",
-		"MT",
-		"NE",
-		"NV",
-		"NH",
-		"NJ",
-		"NM",
-		"NY",
-		"NC",
-		"ND",
-		"OH",
-		"OK",
-		"OR",
-		"PA",
-		"RI",
-		"SC",
-		"SD",
-		"TN",
-		"TX",
-		"UT",
-		"VA",
-		"WA",
-		"WV",
-		"WI",
-		"WY"
-	];
 
 	// This useEffect will run after data updates to check for form validation.
 	useEffect(() => {
@@ -162,38 +123,99 @@ function Survey(props) {
 		}
 
 		var stringCheckedForLength = false;
-		var stringNotEmpty = false;
+		var streetAddressNotEmpty = false;
 		var stringCheckedForAlphaNumeric = checkStringAlphaNumeric(streetAddress);
 
-		if (streetAddress.length < 40) {
+		var zipCodeCheckedForLength = false;
+		var zipCodeNotEmpty = false;
+		var stringCheckedForNumeric = checkStringNumeric(zipCode);
+
+		var emailCheckedForLength = false;
+		var emailNotEmpty = false;
+		var emailCheckedForValidation = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/.test(email);
+		var emailsMatch = false;
+
+		if (streetAddress.length < 41) {
 			stringCheckedForLength = true;
 		}
 		if (streetAddress !== "") {
-			stringNotEmpty = true;
+			streetAddressNotEmpty = true;
 		}
 
-		if (stringCheckedForAlphaNumeric && stringCheckedForLength && stringNotEmpty) {
+		if (zipCode.length < 6) {
+			zipCodeCheckedForLength = true;
+		}
+		if (zipCode !== "") {
+			zipCodeNotEmpty = true;
+		}
+
+		if (email.length < 41) {
+			emailCheckedForLength = true;
+		}
+		if (email !== "") {
+			emailNotEmpty = true;
+		}
+		if (email === confirmEmail) {
+			emailsMatch = true;
+		}
+
+		if (stringCheckedForAlphaNumeric && stringCheckedForLength && streetAddressNotEmpty) {
 			setCheckedAddressError(false);
-		} else if (!stringCheckedForAlphaNumeric && !stringCheckedForLength && stringNotEmpty) {
-			setErrorText("Address contains non-alphanumeric characters and cannot be more than 40 characters");
+		} else if (!stringCheckedForAlphaNumeric && !stringCheckedForLength && streetAddressNotEmpty) {
+			setAddressErrorText("Address contains non-alphanumeric characters and cannot be more than 40 characters");
 			setCheckedAddressError(true);
-		} else if (!stringCheckedForAlphaNumeric && stringCheckedForLength && stringNotEmpty) {
-			setErrorText("Address contains non-alphanumeric characters");
+		} else if (!stringCheckedForAlphaNumeric && stringCheckedForLength && streetAddressNotEmpty) {
+			setAddressErrorText("Address contains non-alphanumeric characters");
 			setCheckedAddressError(true);
-		} else if (stringCheckedForAlphaNumeric && !stringCheckedForLength && stringNotEmpty) {
-			setErrorText("Address cannot be more than 40 characters");
+		} else if (stringCheckedForAlphaNumeric && !stringCheckedForLength && streetAddressNotEmpty) {
+			setAddressErrorText("Address cannot be more than 40 characters");
 			setCheckedAddressError(true);
 		} else {
 			setCheckedAddressError(false); // Field is empty
 		}
 
-		if (checkedAddressError || checkedValidationNameError) {
+		if (zipCodeCheckedForLength && stringCheckedForNumeric && zipCodeNotEmpty) {
+			setCheckedZipCodeError(false);
+		} else if (!zipCodeCheckedForLength && !stringCheckedForNumeric && zipCodeNotEmpty) {
+			setZipCodeErrorText("ZIP Code contains non-numeric characters and cannot be more than 5 numbers");
+			setCheckedZipCodeError(true);
+		} else if (zipCodeCheckedForLength && !stringCheckedForNumeric && zipCodeNotEmpty) {
+			setZipCodeErrorText("ZIP Code contains non-numeric characters");
+			setCheckedZipCodeError(true);
+		} else if (!zipCodeCheckedForLength && stringCheckedForNumeric && zipCodeNotEmpty) {
+			setZipCodeErrorText("ZIP Code cannot be more than 5 numbers");
+			setCheckedZipCodeError(true);
+		} else {
+			setCheckedZipCodeError(false); // Field is empty
+		}
+
+		if (emailCheckedForLength && emailCheckedForValidation && emailNotEmpty) {
+			setCheckedEmailError(false);
+		} else if (!emailCheckedForLength && !emailCheckedForValidation && emailNotEmpty) {
+			setEmailErrorText("Invalid email and cannot be more than 40 characters");
+			setCheckedEmailError(true);
+		} else if (!emailCheckedForLength && emailCheckedForValidation && emailNotEmpty) {
+			setEmailErrorText("Email cannot be more than 40 characters");
+			setCheckedEmailError(true);
+		} else if (emailCheckedForLength && !emailCheckedForValidation && emailNotEmpty) {
+			setEmailErrorText("Invalid email");
+			setCheckedEmailError(true);
+		} else {
+			setCheckedEmailError(false); // Field empty
+		}
+
+		if (emailsMatch) {
+			setCheckedConfirmEmailError(false);
+		} else {
+			setConfirmEmailErrorText("Emails must match!");
+			setCheckedConfirmEmailError(true);
+		}
+
+		if (checkedAddressError || checkedZipCodeError || checkedEmailError || checkedConfirmEmailError || checkedValidationNameError) {
 			setContainsError(true);
 		} else {
 			setContainsError(false);
 		}
-
-		addressTextFieldRender();
 	}, [data]);
 
 	// Checks character codes against ASCII codes and returns false if character is not alphanumeric.
@@ -202,7 +224,20 @@ function Survey(props) {
 		for (var i = 0; i < myString.length; i++) {
 			var charCode = myString.charCodeAt(i);
 
-			if (!(charCode == 32) && !(charCode > 47 && charCode < 58) && !(charCode > 64 && charCode < 91) && !(charCode > 96 && charCode < 123)) {
+			if (!(charCode === 32) && !(charCode > 47 && charCode < 58) && !(charCode > 64 && charCode < 91) && !(charCode > 96 && charCode < 123)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	// Checks character codes against ASCII codes and returns false if character is not numeric.
+	//Otherwise, finish the for loop and then return true.
+	function checkStringNumeric(myString) {
+		for (var i = 0; i < myString.length; i++) {
+			var charCode = myString.charCodeAt(i);
+
+			if (!(charCode > 47 && charCode < 58)) {
 				return false;
 			}
 		}
@@ -212,28 +247,6 @@ function Survey(props) {
 	// This gets called after successfully completing the CAPTCHA.
 	function recaptchaCheck() {
 		setCheckedCaptcha(true);
-	}
-
-	function addressTextFieldRender() {
-		if (checkedAddressError) {
-			return (
-				<TextField
-					error
-					helperText={errorText}
-					id="street-address-textfield"
-					label="Street Address"
-					value={streetAddress}
-					onChange={(e) => setStreetAddress(e.target.value)}
-					required
-					variant="filled"
-					style={{ width: "80%" }}
-				/>
-			);
-		} else {
-			return (
-				<TextField id="street-address-textfield" label="Street Address" value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} required variant="filled" style={{ width: "80%" }} />
-			);
-		}
 	}
 
 	// Perform if statement checks against the requirements and update the button if errors occur or the user forgot something.
@@ -415,7 +428,7 @@ function Survey(props) {
 								{checkedAddressError ? (
 									<TextField
 										error
-										helperText={errorText}
+										helperText={addressErrorText}
 										id="street-address-textfield"
 										label="Street Address"
 										value={streetAddress}
@@ -453,7 +466,11 @@ function Survey(props) {
 
 						<Grid container direction="row" justify="flex-start" alignItems="center" spacing={1} style={{ paddingTop: 10 }}>
 							<Grid item xs={6} sm={3}>
-								<TextField id="zip-code-textfield" label="ZIP Code" value={zipCode} onChange={(e) => setZipCode(e.target.value)} required variant="filled" />
+								{checkedZipCodeError ? (
+									<TextField error helperText={zipCodeErrorText} id="zip-code-textfield" label="ZIP Code" value={zipCode} onChange={(e) => setZipCode(e.target.value)} required variant="filled" />
+								) : (
+									<TextField id="zip-code-textfield" label="ZIP Code" value={zipCode} onChange={(e) => setZipCode(e.target.value)} required variant="filled" />
+								)}
 							</Grid>
 							<Grid item xs={6} sm={3}>
 								<TextField id="city-textfield" label="City" value={city} onChange={(e) => setCity(e.target.value)} required variant="filled" />
@@ -473,13 +490,49 @@ function Survey(props) {
 
 						<Grid container direction="row" justify="flex-start" alignItems="center" spacing={1} style={{ paddingTop: 10 }}>
 							<Grid item xs={12}>
-								<TextField id="email-address-textfield" label="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} required variant="filled" style={{ width: "80%" }} />
+								{checkedEmailError ? (
+									<TextField
+										error
+										helperText={emailErrorText}
+										id="email-address-textfield"
+										label="Email Address"
+										value={email}
+										onChange={(e) => setEmail(e.target.value)}
+										required
+										variant="filled"
+										style={{ width: "80%" }}
+									/>
+								) : (
+									<TextField id="email-address-textfield" label="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} required variant="filled" style={{ width: "80%" }} />
+								)}
 							</Grid>
 						</Grid>
 
 						<Grid container direction="row" justify="flex-start" alignItems="center" spacing={1} style={{ paddingTop: 10 }}>
 							<Grid item xs={12}>
-								<TextField id="email-address-confirm-textfield" label="Confirm Email Address" required variant="filled" style={{ width: "80%" }} />
+								{checkedConfirmEmailError ? (
+									<TextField
+										error
+										helperText={confirmEmailErrorText}
+										id="email-address-confirm-textfield"
+										label="Confirm Email Address"
+										value={confirmEmail}
+										onChange={(e) => setConfirmEmail(e.target.value)}
+										required
+										variant="filled"
+										style={{ width: "80%" }}
+									/>
+								) : (
+									<TextField
+										id="email-address-confirm-textfield"
+										label="Confirm Email Address"
+										value={confirmEmail}
+										onChange={(e) => setConfirmEmail(e.target.value)}
+										required
+										variant="filled"
+										style={{ width: "80%" }}
+									/>
+								)}
 							</Grid>
 						</Grid>
 
