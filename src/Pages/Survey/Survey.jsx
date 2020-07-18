@@ -32,29 +32,21 @@ const useStyles = makeStyles((theme) => ({
 function Survey(props) {
 	const classes = useStyles();
 
-	// Setting states for the data object for the survey.
-
+	// Setting states for the data object and error validation for the survey form.
 	const [firstName, setFirstName] = useState("");
 	const [lastName, setLastName] = useState("");
-
 	const [birthday, setBirthday] = useState("");
-
 	const [heightFT, setHeightFT] = useState("");
 	const [heightIN, setHeightIN] = useState("");
-
 	const [phone, setPhone] = useState("");
-
 	const [educationLevel, setEducationLevel] = useState("");
-
 	const [streetAddress, setStreetAddress] = useState("");
 	const [streetAddressExtra, setStreetAddressExtra] = useState("");
 	const [zipCode, setZipCode] = useState("");
 	const [city, setCity] = useState("");
 	const [state, setState] = useState("");
-
 	const [email, setEmail] = useState("");
 	const [confirmEmail, setConfirmEmail] = useState("");
-
 	const [checkedTermsAndConditions, setCheckedTermsAndConditions] = useState(false);
 	const [checkedCaptcha, setCheckedCaptcha] = useState(false);
 	const [checkedValidationNameError, setCheckedValidationNameError] = useState(false);
@@ -62,14 +54,13 @@ function Survey(props) {
 	const [checkedZipCodeError, setCheckedZipCodeError] = useState(false);
 	const [checkedEmailError, setCheckedEmailError] = useState(false);
 	const [checkedConfirmEmailError, setCheckedConfirmEmailError] = useState(false);
-
 	const [containsError, setContainsError] = useState(false);
 	const [addressErrorText, setAddressErrorText] = useState("");
 	const [zipCodeErrorText, setZipCodeErrorText] = useState("");
 	const [emailErrorText, setEmailErrorText] = useState("");
 	const [confirmEmailErrorText, setConfirmEmailErrorText] = useState("");
 
-	// This gets called only once after refreshing or pressing the back button to repopulate the fields with your old information.
+	// This useEffect gets called only once after refreshing or pressing the back button to repopulate the fields with your old information.
 	useEffect(() => {
 		if (sessionStorage.getItem("userData")) {
 			const userData = JSON.parse(sessionStorage.getItem("userData"));
@@ -93,7 +84,7 @@ function Survey(props) {
 		}
 	}, []);
 
-	// Every time the textfields are updated, this data object will be updated along with it.
+	// Every time the textfields are updated, this data object will be updated along with it to prepare for sending to Results page.
 	const data = {
 		firstName: firstName,
 		lastName: lastName,
@@ -108,15 +99,13 @@ function Survey(props) {
 		city: city,
 		state: state,
 		email: email,
-		confirmEmail: confirmEmail,
-		checkedTermsAndConditions: checkedTermsAndConditions,
-		checkedCaptcha: checkedCaptcha,
-		checkedValidationNameError: checkedValidationNameError
+		confirmEmail: confirmEmail
 	};
 
-	// This useEffect will run after data updates to check for form validation.
+	// This useEffect will run everytime after data updates to check for form validation.
 	useEffect(() => {
-		if (firstName.length + lastName.length > 40) {
+		// Check to see if the full name is greater than 40 characters.
+		if (firstName.length + lastName.length > 41) {
 			setCheckedValidationNameError(true);
 		} else {
 			setCheckedValidationNameError(false);
@@ -124,41 +113,47 @@ function Survey(props) {
 
 		var stringCheckedForLength = false;
 		var streetAddressNotEmpty = false;
-		var stringCheckedForAlphaNumeric = checkStringAlphaNumeric(streetAddress);
-
+		var stringCheckedForAlphaNumeric = checkStringAlphaNumeric(streetAddress); // Check the street address for alphanumeric characters.
 		var zipCodeCheckedForLength = false;
 		var zipCodeNotEmpty = false;
-		var stringCheckedForNumeric = checkStringNumeric(zipCode);
-
+		var stringCheckedForNumeric = checkStringNumeric(zipCode); // Check the zipcode for numeric characters.
 		var emailCheckedForLength = false;
 		var emailNotEmpty = false;
-		var emailCheckedForValidation = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/.test(email);
+		var emailCheckedForValidation = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/.test(email); // Check the email against this regex.
 		var emailsMatch = false;
 
+		// Check to see if the street address is greater than 40 characters.
 		if (streetAddress.length < 41) {
 			stringCheckedForLength = true;
 		}
+		// Check to see if street address is empty or not to prevent mistakenly showing an error.
 		if (streetAddress !== "") {
 			streetAddressNotEmpty = true;
 		}
 
+		// Check to see if the zip code is less than 7 characters.
 		if (zipCode.length < 6) {
 			zipCodeCheckedForLength = true;
 		}
+		// Check to see if zip code is empty or not to prevent mistakenly showing an error.
 		if (zipCode !== "") {
 			zipCodeNotEmpty = true;
 		}
 
+		// Check to see if the email is greater than 40 characters.
 		if (email.length < 41) {
 			emailCheckedForLength = true;
 		}
+		// Check to see if email is empty or not to prevent mistakenly showing an error.
 		if (email !== "") {
 			emailNotEmpty = true;
 		}
+		// Check to see if email is equal in type and value to confirmEmail.
 		if (email === confirmEmail) {
 			emailsMatch = true;
 		}
 
+		// Check boolean values and assign the appropriate errors and texts if need be for rerendering the textfields.
 		if (stringCheckedForAlphaNumeric && stringCheckedForLength && streetAddressNotEmpty) {
 			setCheckedAddressError(false);
 		} else if (!stringCheckedForAlphaNumeric && !stringCheckedForLength && streetAddressNotEmpty) {
@@ -211,6 +206,7 @@ function Survey(props) {
 			setCheckedConfirmEmailError(true);
 		}
 
+		// If there were any errors, prevent the submit button from showing.
 		if (checkedAddressError || checkedZipCodeError || checkedEmailError || checkedConfirmEmailError || checkedValidationNameError) {
 			setContainsError(true);
 		} else {
@@ -270,6 +266,7 @@ function Survey(props) {
 			buttonDisabled = true;
 		}
 
+		// Conditional rendering of either a disabled submission button or a regular submission button with their appropriate button titles.
 		if (buttonDisabled) {
 			return (
 				<Button type="submit" disabled variant="contained" color="secondary">

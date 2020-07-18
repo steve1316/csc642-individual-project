@@ -14,8 +14,6 @@ const useStyles = makeStyles((theme) => ({
 		left: "50%",
 		top: "30%",
 		transform: "translate(-50%, -50%)",
-		//boxShadow: "0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)",
-		//background: "#f3f3f3",
 		margin: "40px auto"
 	},
 	card: {
@@ -32,6 +30,8 @@ const useStyles = makeStyles((theme) => ({
 
 function Results(props) {
 	const classes = useStyles();
+
+	// These states will check if Geocode is ready for the Map to render.
 	const [isGeocodeDone, setIsGeocodeDone] = useState(false);
 	const [mapCheck, setMapCheck] = useState(false);
 
@@ -43,13 +43,17 @@ function Results(props) {
 
 	function renderResults() {
 		if (sessionStorage.getItem("userData")) {
+			// Grab the data from Survey page.
 			const userData = JSON.parse(sessionStorage.getItem("userData"));
 			console.log("History's data: ", userData);
 
+			// Construct the full address minus the extra bit as it is unnecessary to get coordinates from Geocode.
 			fullAddress = userData.streetAddress + " " + userData.city + " " + userData.state + " " + userData.zipCode;
 
 			Geocode.setApiKey("AIzaSyBYR-fyWSCdQ3XfZohzXX2adrSyta-qYGo");
 
+			// Geocode will take the provided address and then return coordinates in the form of latitude and longtitude. It will then save them
+			// and then wait for 2500ms for the Show Map button to render.
 			Geocode.fromAddress(fullAddress).then(
 				(response) => {
 					const { lat, lng } = response.results[0].geometry.location;
@@ -67,6 +71,7 @@ function Results(props) {
 			var heightMessage = "No height provided";
 			var educationMessage = "No education level provided";
 
+			// Assign appropriate values to height and education if the user did decide to fill them out since they are optional.
 			if (userData.heightFT !== "" || userData.heightIN !== "") {
 				var heightFT = userData.heightFT;
 				var heightIN = userData.heightIN;
@@ -83,6 +88,7 @@ function Results(props) {
 				educationMessage = userData.educationLevel;
 			}
 
+			// Return this div populated with the user's information.
 			return (
 				<div>
 					<p>
@@ -122,6 +128,7 @@ function Results(props) {
 				</div>
 			);
 		} else {
+			// Return this if the user somehow arrived in the Results page without going through the Survey page.
 			return (
 				<div>
 					<h1>Did not receive data object inside history as its null.</h1>
@@ -131,6 +138,7 @@ function Results(props) {
 	}
 
 	function showMap() {
+		// Set booleans to show the map when the Show Map button is clicked.
 		if (coordinates["lati"] !== 0 && coordinates["long"] !== 0) {
 			console.log("Map is now shown!");
 			setMapCheck(true);
