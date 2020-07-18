@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.js": "/csc642-individual-project/static/js/main.443d5460.chunk.js",
-    "main.js.map": "/csc642-individual-project/static/js/main.443d5460.chunk.js.map",
+    "main.js": "/csc642-individual-project/static/js/main.9210967f.chunk.js",
+    "main.js.map": "/csc642-individual-project/static/js/main.9210967f.chunk.js.map",
     "runtime-main.js": "/csc642-individual-project/static/js/runtime-main.0e457be6.js",
     "runtime-main.js.map": "/csc642-individual-project/static/js/runtime-main.0e457be6.js.map",
     "static/js/2.97dced83.chunk.js": "/csc642-individual-project/static/js/2.97dced83.chunk.js",
     "static/js/2.97dced83.chunk.js.map": "/csc642-individual-project/static/js/2.97dced83.chunk.js.map",
     "index.html": "/csc642-individual-project/index.html",
-    "precache-manifest.3b61d475d301e0db1ee616cbf26944e2.js": "/csc642-individual-project/precache-manifest.3b61d475d301e0db1ee616cbf26944e2.js",
+    "precache-manifest.8e2b24be6186ee38107f8abb4e758aa7.js": "/csc642-individual-project/precache-manifest.8e2b24be6186ee38107f8abb4e758aa7.js",
     "service-worker.js": "/csc642-individual-project/service-worker.js",
     "static/js/2.97dced83.chunk.js.LICENSE.txt": "/csc642-individual-project/static/js/2.97dced83.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.0e457be6.js",
     "static/js/2.97dced83.chunk.js",
-    "static/js/main.443d5460.chunk.js"
+    "static/js/main.9210967f.chunk.js"
   ]
 }
