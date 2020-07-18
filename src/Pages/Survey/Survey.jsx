@@ -476,7 +476,17 @@ function Survey(props) {
 								<TextField id="city-textfield" label="City" value={city} onChange={(e) => setCity(e.target.value)} required variant="filled" />
 							</Grid>
 							<Grid item xs={6} sm={3}>
-								<TextField id="textfield-select-state" label="State" select defaultValue="" value={state} onChange={(e) => setState(e.target.value)} required variant="filled">
+								<TextField
+									id="textfield-select-state"
+									label="State"
+									select
+									defaultValue=""
+									value={state}
+									onChange={(e) => setState(e.target.value)}
+									required
+									variant="filled"
+									style={{ width: "100px" }}
+								>
 									{listOfStates.map((state, index) => {
 										return (
 											<MenuItem key={state + "-" + index} value={state}>
